@@ -1,0 +1,8 @@
+#BlueJ class context
+comment0.target=Exploring2DArrays
+comment0.text=\n\ Write\ a\ description\ of\ class\ Exploring2DArrays\ here.\n\ \n\ @author\ (your\ name)\ \n\ @version\ (a\ version\ number\ or\ a\ date)\n
+comment1.params=rows\ cols
+comment1.target=int[][]\ initialize(int,\ int)
+comment2.params=args
+comment2.target=void\ main(java.lang.String[])
+numComments=3
