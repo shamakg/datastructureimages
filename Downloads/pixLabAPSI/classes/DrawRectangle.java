@@ -2,6 +2,10 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,6 +22,7 @@ public class DrawRectangle extends JPanel implements MouseListener, MouseMotionL
     private JTextField idField; // Text field to enter rectangle ID
     private String currentId; // The current ID entered by the user
     private Color currentColor; // Color for the current ID
+    private JButton saveButton; // Button to save rectangles to a file
 
     public DrawRectangle(Picture picture) {
         super();
@@ -31,6 +36,11 @@ public class DrawRectangle extends JPanel implements MouseListener, MouseMotionL
         title.setForeground(Color.white);
         this.add(title);
         this.add(idField);
+
+        // Add a save button
+        saveButton = new JButton("Save Rectangles");
+        saveButton.addActionListener(e -> saveRectangles());
+        this.add(saveButton);
 
         this.addMouseListener(this); // Add mouse listeners
         this.addMouseMotionListener(this);
@@ -61,9 +71,7 @@ public class DrawRectangle extends JPanel implements MouseListener, MouseMotionL
         if (currentRectangle != null) {
             g2d.setColor(currentColor); // Set the current color
             g2d.draw(currentRectangle); // Draw the current rectangle
-            // drawLegend(g2d, currentRectangle);
         }
-
     }
 
     // Draw the legend showing the ID and its corresponding color
@@ -124,6 +132,34 @@ public class DrawRectangle extends JPanel implements MouseListener, MouseMotionL
             int width = Math.abs(startPoint.x - currentPoint.x);
             int height = Math.abs(startPoint.y - currentPoint.y);
             currentRectangle = new Rectangle2D.Double(x, y, width, height);
+        }
+    }
+
+    // Save rectangles and their IDs to a file
+    private void saveRectangles() {
+        JFileChooser fileChooser = new JFileChooser();
+        int returnValue = fileChooser.showSaveDialog(this);
+        if (returnValue == JFileChooser.APPROVE_OPTION) {
+            File file = fileChooser.getSelectedFile();
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+                // Write image dimensions
+                writer.write("Image Width: " + picture.getWidth());
+                writer.newLine();
+                writer.write("Image Height: " + picture.getHeight());
+                writer.newLine();
+                writer.write("Rectangles:\n");
+                for (String id : rectangles.keySet()) {
+                    for (Rectangle2D.Double rect : rectangles.get(id)) {
+                        writer.write("ID: " + id + ", Rect: (" + rect.x + ", " + rect.y + ", " + rect.width + ", "
+                                + rect.height + ")\n");
+                    }
+                }
+                JOptionPane.showMessageDialog(this, "Rectangles saved successfully!", "Success",
+                        JOptionPane.INFORMATION_MESSAGE);
+            } catch (IOException e) {
+                JOptionPane.showMessageDialog(this, "Error saving rectangles: " + e.getMessage(), "Error",
+                        JOptionPane.ERROR_MESSAGE);
+            }
         }
     }
 
