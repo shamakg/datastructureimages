@@ -734,6 +734,27 @@ public class SimplePicture implements DigitalPicture {
     return getTransformEnclosingRect(trans);
   }
 
+  public void drawLabeledBox(int x, int y, int width, int height, String label, Color boxColor, Color textColor) {
+    // Get the graphics object for drawing
+    Graphics2D g2 = createGraphics();
+
+    // Set the color and stroke for the box
+    g2.setColor(boxColor);
+    g2.setStroke(new BasicStroke(2)); // Set the thickness of the box
+
+    // Draw the box (a rectangle)
+    g2.drawRect(x, y, width, height);
+
+    // Set the color for the label text
+    g2.setColor(textColor);
+
+    // Draw the label above the box
+    g2.drawString(label, x, y - 5); // Slightly above the top of the box
+
+    // Dispose the graphics object when done to free resources
+    g2.dispose();
+  }
+
   /**
    * Method to return a string with information about this picture
    * 
