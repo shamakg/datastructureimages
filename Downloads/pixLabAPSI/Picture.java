@@ -82,7 +82,9 @@ private Pixel[][] pixels;
     super(image);
     pixels = this.getPixels2D();
   }
-  
+  public Picture(Pixel[][] arr){
+    pixels = arr;
+  }
   ////////////////////// methods ///////////////////////////////////////
   
   /**
@@ -112,10 +114,11 @@ private Pixel[][] pixels;
             int red = pixelObj.getRed();
             int green = pixelObj.getGreen();
             int blue = pixelObj.getBlue();
-//            pixelObj.setBlue(0);
-            pixelObj.setRed(green & blue);
-            pixelObj.setGreen(green & blue);
-            pixelObj.setBlue(red | green);
+            pixelObj.setBlue(0);
+            
+            // pixelObj.setRed(green & blue);
+            // pixelObj.setGreen(green & blue);
+            // pixelObj.setBlue(red & green);
         }  
     }
   }
@@ -415,7 +418,66 @@ public void seeing4()
         }
   }
 
+  public int[][] greyArray(){
+      Pixel[][] pixels = this.getPixels2D();
+      int h = super.getHeight();
+      int w = super.getWidth();
+      int[][] greyscaleArray = new int[h][w];
+      int currentH = 0;
+      
+      for (Pixel[] rowArray : pixels)
+        {
+          int currentW = 0;
+          for (Pixel pixelObj : rowArray)
+          {
+              
+              int grey = (pixelObj.getRed() + pixelObj.getBlue() + pixelObj.getGreen())/3;
+              greyscaleArray[currentH][currentW] = grey;
+              currentW ++;
+          }
+          currentH ++;  
+        }  
+        return greyscaleArray;
+  }
   
+  public int [][] sobelGreyscale(int[][]A){
+        int kernely[][] = {{-1, -2, -1}, {0,  0,  0}, {1,  2,  1}};
+        int kernelx[][] = {{-1, 0, 1}, {-2, 0, 2}, {-1, 0, 1}};
+        int h = super.getHeight();
+        int w = super.getWidth();
+        int[][] filteredOutput = new int [h-2][w-2];
+        for (int yUpper = 0; yUpper < h-2 ; yUpper++){
+            for (int xLeft = 0; xLeft < w-2 ; xLeft++){
+                int magX = 0;
+                int magY = 0;
+                for(int y = 0; y < 3; y++){
+                    for(int x = 0; x < 3; x++){            
+                        magX += A[yUpper + y][xLeft + x] * kernelx[y][x];
+                        magY += A[yUpper + y][xLeft + x] * kernely[y][x];
+                    }
+                }
+                filteredOutput[yUpper][xLeft] = (int) Math.sqrt(magX * magX + magY * magY);
+            }
+        }
+        return filteredOutput;
+  }
+  
+  public Pixel[][] convertGreyscaleRGB(int [][]grey){
+      Pixel[][] pixels = this.getPixels2D();
+      int h=super.getHeight();
+      int w=super.getWidth();
+      for (int i = 0 ; i < h-2 ; i++)
+        {
+          for (int j = 0 ; j < w-2 ; j++)
+          {
+              Pixel pixelObj = pixels[i][j];
+              pixelObj.setBlue(grey[i][j]);
+              pixelObj.setRed(grey[i][j]);
+              pixelObj.setGreen(grey[i][j]);
+          }
+        }
+        return pixels;
+  }
   /** Method that mirrors the picture around a 
     * vertical mirror in the center of the picture
     * from left to right */
@@ -555,19 +617,42 @@ public void seeing4()
     }
   }
   
-  
+  public static void print2DArray(int[][] array) {
+        // Loop through each row
+        for (int row = 0; row < array.length; row++) {
+            // Loop through each element in the row
+            for (int col = 0; col < array[row].length; col++) {
+                System.out.print(array[row][col] + " ");
+            }
+            // Move to the next line after printing each row
+            System.out.println();
+        }
+    }
+  public void convert (){
+      Picture flutter = new Picture("FlutterBy.png");
+    //    Picture flutter = new Picture("wall.jpg");
+    //    flutter.colorOR();
+    //    flutter.grayscale();
+    flutter.explore();
+    int [][] greyFlutter = flutter.greyArray();
+    int[][] sobel = sobelGreyscale (greyFlutter);
+      
+  }
   /* Main method for testing - each class in Java can have a main 
    * method 
    */
   public static void main(String[] args) 
   {
-    Picture flutter = new Picture("butterfly1.jpg");
-//    Picture flutter = new Picture("wall.jpg");
-//    flutter.colorOR();
-//    flutter.grayscale();
-//    flutter.explore();
-    flutter.zeroBlue();
-//    flutter.seeing4();
+    Picture flutter = new Picture("IMG_8895.jpeg");
+    //    Picture flutter = new Picture("wall.jpg");
+    //    flutter.colorOR();
+    //    flutter.grayscale();
+    flutter.explore();
+    int[][] greys = flutter.greyArray();
+    int[][] converted = flutter.sobelGreyscale(greys);
+    Picture convertedPicture = new Picture(flutter.convertGreyscaleRGB(converted));
+    convertedPicture.explore();
+    //    flutter.seeing4();
     flutter.explore();
   }
   
