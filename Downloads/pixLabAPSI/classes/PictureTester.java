@@ -51,16 +51,12 @@ public class PictureTester {
 
   public static void testrealEdgeDetection() {
     Picture flutter = new Picture("IMG_8895.jpeg");
-    // Picture flutter = new Picture("wall.jpg");
-    // flutter.colorOR();
-    // flutter.grayscale();
-    flutter.explore();
+
     int[][] greys = flutter.greyArray();
     int[][] converted = flutter.sobelGreyscale(greys);
-    Picture convertedPicture = new Picture(flutter.convertGreyscaleRGB(converted));
-    convertedPicture.explore();
-    // flutter.seeing4();
+    flutter.convertGreyscaleRGB(converted);
     flutter.explore();
+
   }
 
   public static void testrectangle() {
@@ -82,6 +78,32 @@ public class PictureTester {
     frame.setVisible(true);
   }
 
+  public static void testRealEdgeDetectionWithRectangleDrawing() {
+    Picture flutter = new Picture("swan.jpg");
+    // Picture flutter = new Picture("wall.jpg");
+    // flutter.colorOR();
+    // flutter.grayscale();
+    // int[][] greys = flutter.greyArray();
+    // int[][] converted = flutter.sobelGreyscale(greys);
+    // flutter.convertGreyscaleRGB(converted);
+    flutter.convert();
+    JFrame frame = new JFrame();
+
+    frame.setSize(flutter.getWidth(), flutter.getHeight());
+
+    // Create a PicturePanel that can display the picture and allow drawing
+    DrawRectangle picturePanel = new DrawRectangle(flutter);
+
+    // // Create a JFrame to hold the PicturePanel
+    frame.getContentPane().add(picturePanel); // Add the PicturePanel to the
+    // frame
+
+    // Set the frame size and make it visible
+
+    frame.setVisible(true);
+
+  }
+
   /**
    * Main method for testing. Every class can have a main
    * method in Java
@@ -91,8 +113,9 @@ public class PictureTester {
     // and comment out the ones you don't want
     // to run
     // testZeroBlue();
-    testrectangle();
-    testrealEdgeDetection();
+    // testrectangle();
+    // testrealEdgeDetection();
+    testRealEdgeDetectionWithRectangleDrawing();
     // testKeepOnlyBlue();
     // testKeepOnlyRed();
     // testKeepOnlyGreen();
