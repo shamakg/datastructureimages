@@ -49,7 +49,21 @@ public class PictureTester {
     swan.explore();
   }
 
-  public static void rectangle() {
+  public static void testrealEdgeDetection() {
+    Picture flutter = new Picture("IMG_8895.jpeg");
+    // Picture flutter = new Picture("wall.jpg");
+    // flutter.colorOR();
+    // flutter.grayscale();
+    flutter.explore();
+    int[][] greys = flutter.greyArray();
+    int[][] converted = flutter.sobelGreyscale(greys);
+    Picture convertedPicture = new Picture(flutter.convertGreyscaleRGB(converted));
+    convertedPicture.explore();
+    // flutter.seeing4();
+    flutter.explore();
+  }
+
+  public static void testrectangle() {
     Picture picture = new Picture("swan.jpg");
 
     JFrame frame = new JFrame();
@@ -77,7 +91,8 @@ public class PictureTester {
     // and comment out the ones you don't want
     // to run
     // testZeroBlue();
-    rectangle();
+    testrectangle();
+    testrealEdgeDetection();
     // testKeepOnlyBlue();
     // testKeepOnlyRed();
     // testKeepOnlyGreen();
