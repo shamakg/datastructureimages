@@ -7,7 +7,6 @@
  * 
  * @author Barbara Ericson
  */
-import java.awt.*;
 import javax.swing.*;
 
 public class PictureTester {
@@ -49,6 +48,7 @@ public class PictureTester {
     swan.explore();
   }
 
+  /** RYAN */
   public static void testrealEdgeDetection() {
     Picture flutter = new Picture("IMG_8895.jpeg");
 
@@ -59,6 +59,7 @@ public class PictureTester {
 
   }
 
+  /** SHAMAK */
   public static void testrectangle() {
     Picture picture = new Picture("swan.jpg");
 
@@ -78,8 +79,9 @@ public class PictureTester {
     frame.setVisible(true);
   }
 
+  /** RYAN AND SHAMAK */
   public static void testRealEdgeDetectionWithRectangleDrawing() {
-    Picture flutter = new Picture("swan.jpg");
+    Picture flutter = new Picture("classes/groupanimal.jpg");
     // Picture flutter = new Picture("wall.jpg");
     // flutter.colorOR();
     // flutter.grayscale();

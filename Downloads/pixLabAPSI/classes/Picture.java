@@ -1,11 +1,5 @@
 import java.awt.*;
-import java.awt.font.*;
-import java.awt.geom.*;
 import java.awt.image.BufferedImage;
-import java.text.*;
-import java.util.*;
-import java.util.List;
-import java.util.ArrayList;
 import java.util.Random; // resolves problem with java.awt.List and java.util.List
 
 /**
@@ -365,63 +359,6 @@ public class Picture extends SimplePicture {
     }
   }
 
-  public int[][] greyArray() {
-    Pixel[][] pixels = this.getPixels2D();
-    int h = super.getHeight();
-    int w = super.getWidth();
-    int[][] greyscaleArray = new int[h][w];
-    int currentH = 0;
-
-    for (Pixel[] rowArray : pixels) {
-      int currentW = 0;
-      for (Pixel pixelObj : rowArray) {
-
-        int grey = (pixelObj.getRed() + pixelObj.getBlue() + pixelObj.getGreen()) / 3;
-        greyscaleArray[currentH][currentW] = grey;
-        currentW++;
-      }
-      currentH++;
-    }
-    return greyscaleArray;
-  }
-
-  public int[][] sobelGreyscale(int[][] A) {
-    int kernely[][] = { { -1, -2, -1 }, { 0, 0, 0 }, { 1, 2, 1 } };
-    int kernelx[][] = { { -1, 0, 1 }, { -2, 0, 2 }, { -1, 0, 1 } };
-    int h = super.getHeight();
-    int w = super.getWidth();
-    int[][] filteredOutput = new int[h - 2][w - 2];
-    for (int yUpper = 0; yUpper < h - 2; yUpper++) {
-      for (int xLeft = 0; xLeft < w - 2; xLeft++) {
-        int magX = 0;
-        int magY = 0;
-        for (int y = 0; y < 3; y++) {
-          for (int x = 0; x < 3; x++) {
-            magX += A[yUpper + y][xLeft + x] * kernelx[y][x];
-            magY += A[yUpper + y][xLeft + x] * kernely[y][x];
-          }
-        }
-        filteredOutput[yUpper][xLeft] = (int) Math.sqrt(magX * magX + magY * magY);
-      }
-    }
-    return filteredOutput;
-  }
-
-  public Pixel[][] convertGreyscaleRGB(int[][] grey) {
-    Pixel[][] pixels = this.getPixels2D();
-    int h = super.getHeight();
-    int w = super.getWidth();
-    for (int i = 0; i < h - 2; i++) {
-      for (int j = 0; j < w - 2; j++) {
-        Pixel pixelObj = pixels[i][j];
-        pixelObj.setBlue(grey[i][j]);
-        pixelObj.setRed(grey[i][j]);
-        pixelObj.setGreen(grey[i][j]);
-      }
-    }
-    return pixels;
-  }
-
   /**
    * Method that mirrors the picture around a
    * vertical mirror in the center of the picture
@@ -557,10 +494,92 @@ public class Picture extends SimplePicture {
     }
   }
 
+  // RYAN AND SHAMAK ADDED BELOW
+
+  /**
+   * @param none
+   * @return 2D array of greyscale values
+   */
+  public int[][] greyArray() {
+    // modify pixels in picture object
+    Pixel[][] pixels = this.getPixels2D();
+    int h = super.getHeight();
+    int w = super.getWidth();
+
+    // create array to hold
+    int[][] greyscaleArray = new int[h][w];
+    int currentH = 0;
+
+    // iterate through all pixels and get grayscale by averaging
+    for (Pixel[] rowArray : pixels) {
+      int currentW = 0;
+      for (Pixel pixelObj : rowArray) {
+
+        int grey = (pixelObj.getRed() + pixelObj.getBlue() + pixelObj.getGreen()) / 3;
+        greyscaleArray[currentH][currentW] = grey;
+        currentW++;
+      }
+      currentH++;
+    }
+    return greyscaleArray;
+  }
+
+  /**
+   * 
+   * @param A
+   * @return 2D array filtered with sobel filter
+   */
+  public int[][] sobelGreyscale(int[][] A) {
+    // x and y gradient kernels
+    int kernely[][] = { { -1, -2, -1 }, { 0, 0, 0 }, { 1, 2, 1 } };
+    int kernelx[][] = { { -1, 0, 1 }, { -2, 0, 2 }, { -1, 0, 1 } };
+    int h = super.getHeight();
+    int w = super.getWidth();
+
+    // extracting a part of the image to match the sobel filter
+    int[][] filteredOutput = new int[h - 2][w - 2];
+    for (int yUpper = 0; yUpper < h - 2; yUpper++) {
+      for (int xLeft = 0; xLeft < w - 2; xLeft++) {
+        int magX = 0;
+        int magY = 0;
+        // iterate through the kernel to find the total gradient in x and y
+        for (int y = 0; y < 3; y++) {
+          for (int x = 0; x < 3; x++) {
+            magX += A[yUpper + y][xLeft + x] * kernelx[y][x];
+            magY += A[yUpper + y][xLeft + x] * kernely[y][x];
+          }
+        }
+        // calculate overall gradient
+        filteredOutput[yUpper][xLeft] = (int) Math.sqrt(magX * magX + magY * magY);
+      }
+    }
+    return filteredOutput;
+  }
+
+  /**
+   * 
+   * @param grey
+   * @return void
+   */
+  public void convertGreyscaleRGB(int[][] grey) {
+    Pixel[][] pixels = this.getPixels2D();
+    int h = super.getHeight();
+    int w = super.getWidth();
+    // iterate through the pixels
+    for (int i = 0; i < h - 2; i++) {
+      for (int j = 0; j < w - 2; j++) {
+        Pixel pixelObj = pixels[i][j];
+        pixelObj.setBlue(grey[i][j]);
+        pixelObj.setRed(grey[i][j]);
+        pixelObj.setGreen(grey[i][j]);
+      }
+    }
+  }
+
+  /**
+   * @param none
+   */
   public void convert() {
-    // Picture flutter = new Picture("wall.jpg");
-    // flutter.colorOR();
-    // flutter.grayscale();
     int[][] greyFlutter = greyArray();
     int[][] sobel = sobelGreyscale(greyFlutter);
     convertGreyscaleRGB(sobel);

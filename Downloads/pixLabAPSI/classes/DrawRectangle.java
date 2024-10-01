@@ -1,3 +1,8 @@
+
+/**
+ * @author Shamak Gowda
+ * This class is entirely for drawing rectangles
+ */
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.Rectangle2D;
@@ -23,6 +28,7 @@ public class DrawRectangle extends JPanel implements MouseListener, MouseMotionL
     private String currentId; // The current ID entered by the user
     private Color currentColor; // Color for the current ID
     private JButton saveButton; // Button to save rectangles to a file
+    private JButton undoButton; // to Undo
 
     public DrawRectangle(Picture picture) {
         super();
@@ -33,7 +39,7 @@ public class DrawRectangle extends JPanel implements MouseListener, MouseMotionL
         // Create a new label to tell the user to enter the rectangle id
         idField = new JTextField(10);
         JLabel title = new JLabel("Enter Rectangle ID");
-        title.setForeground(Color.white);
+        title.setForeground(Color.red);
         this.add(title);
         this.add(idField);
 
@@ -41,6 +47,10 @@ public class DrawRectangle extends JPanel implements MouseListener, MouseMotionL
         saveButton = new JButton("Save Rectangles");
         saveButton.addActionListener(e -> saveRectangles());
         this.add(saveButton);
+
+        undoButton = new JButton("Undo Last Rectangle");
+        undoButton.addActionListener(e -> undoLastRectangle());
+        this.add(undoButton);
 
         // MouseListener for the user to drag the rectangle
         this.addMouseListener(this);
@@ -94,10 +104,9 @@ public class DrawRectangle extends JPanel implements MouseListener, MouseMotionL
 
         g2d.setColor(idColors.get(id));
         g2d.fillRect(xPosition, yPosition, 20, 20);
-        g2d.setColor(Color.WHITE);
         g2d.drawRect(xPosition, yPosition, 20, 20);
         g2d.drawString(id, xPosition + 30, yPosition + 15); // Draw the ID next to the box
-        g2d.setColor(idColors.get(id));
+
     }
 
     /**
@@ -107,8 +116,8 @@ public class DrawRectangle extends JPanel implements MouseListener, MouseMotionL
      */
     @Override
     public void mousePressed(MouseEvent e) {
-        startPoint = e.getPoint(); // Capture the starting point
-        currentId = idField.getText(); // Get the ID from the text field
+        startPoint = e.getPoint(); // Get the starting point
+        currentId = idField.getText();
         // create an alert box
         if (currentId.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Please enter an ID for the rectangle.", "Error",
@@ -116,12 +125,26 @@ public class DrawRectangle extends JPanel implements MouseListener, MouseMotionL
             return;
         }
 
-        // Check if the ID already has a color, if not assign a random color
         if (!idColors.containsKey(currentId)) {
-            currentColor = new Color((int) (Math.random() * 0x1000000));
+            // Generate vibrant colors by controlling RGB components
+            // High values --> more white
+            int r = (int) (Math.random() * 128) + 128; // Red is between 128 and 255
+            int g = (int) (Math.random() * 128) + 128; // Green is between 128 and 255
+            int b = (int) (Math.random() * 128) + 128; // Blue is between 128 and 255
+
+            // randomly set one of the RGB channels to a lower value
+            // for more color variety but still ensure high contrast.
+            if (Math.random() < 0.33)
+                r = (int) (Math.random() * 128); // Chance to lower Red
+            else if (Math.random() < 0.5)
+                g = (int) (Math.random() * 128); // Chance to lower Green
+            else
+                b = (int) (Math.random() * 128); // Chance to lower Blue
+
+            currentColor = new Color(r, g, b);
             idColors.put(currentId, currentColor);
         } else {
-            currentColor = idColors.get(currentId);
+            currentColor = idColors.get(currentId); // Retrieve the existing color
         }
     }
 
@@ -175,8 +198,10 @@ public class DrawRectangle extends JPanel implements MouseListener, MouseMotionL
     private void saveRectangles() {
         JFileChooser fileChooser = new JFileChooser();
         int returnValue = fileChooser.showSaveDialog(this);
+
         if (returnValue == JFileChooser.APPROVE_OPTION) {
             File file = fileChooser.getSelectedFile();
+
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
                 // Write image dimensions
                 writer.write("Image Width: " + picture.getWidth());
@@ -190,6 +215,7 @@ public class DrawRectangle extends JPanel implements MouseListener, MouseMotionL
                                 + rect.height + ")\n");
                     }
                 }
+
                 // create an alert for the user
                 JOptionPane.showMessageDialog(this, "Rectangles saved successfully!", "Success",
                         JOptionPane.INFORMATION_MESSAGE);
@@ -197,7 +223,27 @@ public class DrawRectangle extends JPanel implements MouseListener, MouseMotionL
                 JOptionPane.showMessageDialog(this, "Error saving rectangles: " + e.getMessage(), "Error",
                         JOptionPane.ERROR_MESSAGE);
             }
+
         }
+    }
+
+    /**
+     * @param none
+     * @return void
+     *         Undo the last rectangle drawn
+     */
+    private void undoLastRectangle() {
+        if (currentId != null && rectangles.containsKey(currentId)) {
+            List<Rectangle2D.Double> rectList = rectangles.get(currentId);
+            if (!rectList.isEmpty()) {
+                rectList.remove(rectList.size() - 1); // Remove the last rectangle
+                if (rectList.isEmpty()) {
+                    rectangles.remove(currentId); // Remove the ID if no rectangles are left
+                    idColors.remove(currentId);
+                }
+            }
+        }
+        repaint(); // Redraw without the last rectangle
     }
 
     // Unused methods
