@@ -81,20 +81,14 @@ public class PictureTester {
 
   /** RYAN AND SHAMAK */
   public static void testRealEdgeDetectionWithRectangleDrawing() {
-    Picture flutter = new Picture("classes/groupanimal.jpg");
-    // Picture flutter = new Picture("wall.jpg");
-    // flutter.colorOR();
-    // flutter.grayscale();
-    // int[][] greys = flutter.greyArray();
-    // int[][] converted = flutter.sobelGreyscale(greys);
-    // flutter.convertGreyscaleRGB(converted);
-    flutter.convert();
+    Picture pic = new Picture("classes/groupanimal.jpg");
+    pic.convert();
     JFrame frame = new JFrame();
 
-    frame.setSize(flutter.getWidth(), flutter.getHeight());
+    frame.setSize(pic.getWidth(), pic.getHeight());
 
     // Create a PicturePanel that can display the picture and allow drawing
-    DrawRectangle picturePanel = new DrawRectangle(flutter);
+    DrawRectangle picturePanel = new DrawRectangle(pic);
 
     // // Create a JFrame to hold the PicturePanel
     frame.getContentPane().add(picturePanel); // Add the PicturePanel to the

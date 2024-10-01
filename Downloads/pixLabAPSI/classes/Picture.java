@@ -536,7 +536,7 @@ public class Picture extends SimplePicture {
     int h = super.getHeight();
     int w = super.getWidth();
 
-    // extracting a part of the image to match the sobel filter
+    // 3x3 filter reduces each dimension by 2
     int[][] filteredOutput = new int[h - 2][w - 2];
     for (int yUpper = 0; yUpper < h - 2; yUpper++) {
       for (int xLeft = 0; xLeft < w - 2; xLeft++) {
